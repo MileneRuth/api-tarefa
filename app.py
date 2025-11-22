@@ -17,7 +17,7 @@ def criar_tarefa():
     print("DEBUG:", dados)
 
     if not dados or "titulo" not in dados:
-        return jsonify({"erro": "campo 'titulo' é obrigatorio"}), 400
+        return jsonify({"erro": "Campo 'titulo' é obrigatorio"}), 400
 
     nova_tarefa = {
         "id": len(tarefas) + 1,
@@ -27,6 +27,24 @@ def criar_tarefa():
 
     tarefas.append(nova_tarefa)
     return jsonify(nova_tarefa), 201
+
+@app.route('/tarefas/<int:id>', methods=['PUT'])
+def atualizar_tarefa(id):
+    dados = request.get_json()
+    for tarefa in tarefas:
+        if tarefa['id'] == id:
+            tarefa['titulo'] = dados.get('titulo',tarefa['titulo'])
+            tarefa['status'] = dados.get('status',tarefa['status'])
+            return jsonify(tarefa), 200
+    return jsonify({"erro": "tarefa não encontrada"}), 404
+    
+@app.route('/tarefas/<int:id>', methods=['DELETE'])
+def deletar_tarefa(id):
+    for tarefa in tarefas:
+        if tarefa["id"] == id:
+            tarefas.remove(tarefa)
+            return jsonify({"mensagem": "tarefa deletada"}), 200
+    return jsonify({"erro": "tarefa não encontrada"}), 404
 
 if __name__ == '__main__':
     app.run(debug=True)
